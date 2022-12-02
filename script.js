@@ -293,6 +293,7 @@ function addPolygon(color, posX1, posY1, posZ1,
 }
 
 function clearRender() {
+    camPosZ = 0;
     let allObjects = document.getElementsByClassName("object");
     for (let i = 0; i < allObjects.length; i++) {
         allObjects[i].classList.add("remove");
