@@ -5,6 +5,7 @@ let autoMove = false;
 let movingForward = true;
 frameWait = 16;
 let camPosZ = 0.0;
+let camPosX = 10.0;
 let fov = 60;
 let groundY = -1.5;
 
@@ -33,6 +34,14 @@ document.addEventListener("keypress", (e) => {
         case "s":
         case "S":
             camPosZ -= 1;
+            break;
+        case "a":
+        case "A":
+            camPosX -= 1;
+            break;
+        case "d":
+        case "D":
+            camPosX += 1;
             break;
     }
 });
@@ -63,10 +72,10 @@ document.addEventListener("keyup", (e) => {
             console.log("test");
             console.log(instr.style.display);
             console.log(instr.style.display == "hide");
-            if(instr.classList.contains("hide")){
+            if (instr.classList.contains("hide")) {
                 instr.classList.remove("hide");
             }
-            else{
+            else {
                 instr.classList.add("hide");
             }
             break;
@@ -218,7 +227,10 @@ function addPolygon(color, posX1, posY1, posZ1,
     posX2, posY2, posZ2,
     posX3, posY3, posZ3,
     posX4, posY4, posZ4) {
-
+    let locationData = [[posX1, posY1, posZ1],
+    [posX2, posY2, posZ2],
+    [posX3, posY3, posZ3],
+    [posX4, posY4, posZ4]];
     let polygon = document.createElement("div");
     polygon.style.position = "absolute";
     polygon.style.background = color;
@@ -230,61 +242,48 @@ function addPolygon(color, posX1, posY1, posZ1,
 
     game.appendChild(polygon);
 
+    function getScreenPos([x, y, z],vw,vh) {
+        let distance = z - camPosZ;
+        let highest = distance / 2;
+        let ScreenPos = []
+
+        yRes = (y / highest) * (vh / 2);
+        yRes = -yRes + (vh / 2);
+        yRes = (yRes / vh * 100);
+        xRes = (x / highest) * (vw / 2);
+        xRes = -xRes + (vw / 2);
+        xRes = (xRes / vw * 100);
+
+        ScreenPos.push(xRes);
+        ScreenPos.push(yRes);
+
+        return ScreenPos;
+    }
+
     let drawPolygon = setInterval(() => {
         if (polygon.classList.contains("remove")) {
             clearInterval(drawPolygon);
             polygon.remove();
         }
-        let vh = document.documentElement.clientHeight;
-        let vw = document.documentElement.clientWidth;
         let distance1 = posZ1 - camPosZ;
         let distance3 = posZ3 - camPosZ;
         if (distance1 > 0 && distance3 > 0) {
+
+            let vh = document.documentElement.clientHeight;
+            let vw = document.documentElement.clientWidth;
             polygon.style.display = "block";
             polygon.style.zIndex = 100000 - distance1;
 
-            //Determine 1  %
-            let highest1 = distance1 / 2;
-            yRes1 = (posY1 / highest1) * (vh / 2);
-            yRes1 = -yRes1 + (vh / 2);
-            yRes1 = (yRes1 / vh * 100);
-            xRes1 = (posX1 / highest1) * (vw / 2);
-            xRes1 = -xRes1 + (vw / 2);
-            xRes1 = (xRes1 / vw * 100);
+            
+            let screenPositions = []
+            for (let i = 0; i < 4; i++) {
+                screenPositions.push(getScreenPos(locationData[i],vw,vh))
+            }
 
-            //Determine 2  %
-            let distance2 = posZ2 - camPosZ;
-            let highest2 = distance2 / 2;
-            yRes2 = (posY2 / highest2) * (vh / 2);
-            yRes2 = -yRes2 + (vh / 2);
-            yRes2 = (yRes2 / vh * 100);
-            xRes2 = (posX2 / highest2) * (vw / 2);
-            xRes2 = -xRes2 + (vw / 2);
-            xRes2 = (xRes2 / vw * 100);
-
-            //Determine 3  %
-            let highest3 = distance3 / 2;
-            yRes3 = (posY3 / highest3) * (vh / 2);
-            yRes3 = -yRes3 + (vh / 2);
-            yRes3 = (yRes3 / vh * 100);
-            xRes3 = (posX3 / highest3) * (vw / 2);
-            xRes3 = -xRes3 + (vw / 2);
-            xRes3 = (xRes3 / vw * 100);
-
-            //Determine 4  %
-            let distance4 = posZ4 - camPosZ;
-            let highest4 = distance4 / 2;
-            yRes4 = (posY4 / highest4) * (vh / 2);
-            yRes4 = -yRes4 + (vh / 2);
-            yRes4 = (yRes4 / vh * 100);
-            xRes4 = (posX4 / highest4) * (vw / 2);
-            xRes4 = -xRes4 + (vw / 2);
-            xRes4 = (xRes4 / vw * 100);
-
-            polygon.style.clipPath = `polygon(${xRes1}% ${yRes1}%,
-                ${xRes2}% ${yRes2}%,
-                ${xRes3}% ${yRes3}%,
-                ${xRes4}% ${yRes4}%)`;
+            polygon.style.clipPath = `polygon(${screenPositions[0][0]}% ${screenPositions[0][1]}%,
+                ${screenPositions[1][0]}% ${screenPositions[1][1]}%,
+                ${screenPositions[2][0]}% ${screenPositions[2][1]}%,
+                ${screenPositions[3][0]}% ${screenPositions[3][1]}%)`;
         }
         else {
             polygon.style.display = "none";
