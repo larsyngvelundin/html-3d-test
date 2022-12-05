@@ -7,6 +7,9 @@ frameWait = 16;
 let camPosZ = 0.0;
 let fov = 60;
 let groundY = -1.5;
+let psxMode = false;
+
+//320x240 mode, with PSX flickering
 
 //instructions
 let instr = document.createElement("div");
