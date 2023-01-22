@@ -1,10 +1,13 @@
+import clearRender from "./clearRender.js";
+import initPolygons from "./initPolygons.js";
+
 export default function addEventListeners() {
     let game = document.getElementById("game");
     document.addEventListener("keypress", (e) => {
         switch (e.key) {
             case "w":
             case "W":
-                game.dataset.camPosZ += 1;
+                game.dataset.camPosZ = parseFloat(game.dataset.camPosZ) + 1;
                 break;
             case "s":
             case "S":
@@ -16,7 +19,7 @@ export default function addEventListeners() {
                 break;
             case "d":
             case "D":
-                game.dataset.camPosX += 1;
+                game.dataset.camPosX = parseFloat(game.dataset.camPosX) + 1;
                 break;
         }
     });
@@ -35,7 +38,7 @@ export default function addEventListeners() {
             case "r":
             case "R":
                 clearRender();
-                initLines();
+                //initLines();
                 break;
             case "t":
             case "T":
